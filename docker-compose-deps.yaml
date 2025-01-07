@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: db
+    restart: always
+    ports:
+      - "6543:5432"
+    environment:
+      POSTGRES_USER: abc
+      POSTGRES_DB: userbase
+      POSTGRES_PASSWORD: pw123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      default:
+        aliases:
+          - db
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  postgres_data:
