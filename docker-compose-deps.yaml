@@ -1,23 +1,38 @@
 services:
   postgres:
     image: postgres:17
-    container_name: db
     restart: always
     ports:
       - "6543:5432"
     environment:
-      POSTGRES_USER: abc
-      POSTGRES_DB: userbase
-      POSTGRES_PASSWORD: pw123
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      default:
-        aliases:
-          - db
+      - appnet
+  
+  minio:
+    image: minio/minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+    networks:
+      - appnet
+
 networks:
-  default:
+  appnet:
     driver: bridge
 
 volumes:
   postgres_data:
+  minio_data:

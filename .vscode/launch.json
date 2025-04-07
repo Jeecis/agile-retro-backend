@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug API",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/cmd/api/main.go", // Adjust this path to your main.go file
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
