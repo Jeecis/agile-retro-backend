@@ -1,5 +1,10 @@
 package service
 
+// AuthService handles authentication-related operations.
+// Future implementation:
+// - Add password hashing and verification.
+// - Implement token generation and validation for user sessions.
+
 import "github.com/Jeecis/goapi/internal/repository"
 
 type AuthService struct {

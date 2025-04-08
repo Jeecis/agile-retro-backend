@@ -1,15 +1,18 @@
 package routes
 
 import (
-	"database/sql"
-
 	"github.com/Jeecis/goapi/internal/api/handlers"
+	"github.com/Jeecis/goapi/internal/repository"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go"
+	"gorm.io/gorm"
 )
 
-func SetupRouter(db *sql.DB, minio *minio.Client) *gin.Engine {
+func SetupRouter(db *gorm.DB, minio *minio.Client, boardRepo *repository.BoardRepository,
+	columnRepo *repository.ColumnRepository,
+	recordRepo *repository.RecordRepository,
+) *gin.Engine {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
@@ -24,12 +27,28 @@ func SetupRouter(db *sql.DB, minio *minio.Client) *gin.Engine {
 	{
 		v0.GET("/health", handlers.HealthCheck)
 
-		v0.POST("/board", handlers.CreateBoard)
-		v0.GET("/board", handlers.GetBoardList)
-		v0.GET("/board/{id}", handlers.GetBoard)
-		v0.PUT("/board", handlers.UpdateBoard)
-		v0.DELETE("/board", handlers.DeleteBoard)
+		b := v0.Group("/board")
+		b.POST("", handlers.CreateBoardHandler(boardRepo))
+		b.GET("", handlers.GetBoardListHandler(boardRepo))
+		b.GET("/{id}", handlers.GetBoardHandler(boardRepo))
+		b.PUT("", handlers.UpdateBoardHandler(boardRepo))
+		b.DELETE("", handlers.DeleteBoardHandler(boardRepo))
+
+		c := v0.Group("/column")
+		c.POST("", handlers.CreateColumnHandler(columnRepo))
+		c.GET("", handlers.GetColumnListHandler(columnRepo))
+		c.GET("/{id}", handlers.GetColumnHandler(columnRepo))
+		c.PUT("", handlers.UpdateColumnHandler(columnRepo))
+		c.DELETE("", handlers.DeleteColumnHandler(columnRepo))
+
+		r := v0.Group("/record")
+		r.POST("", handlers.CreateRecordHandler(recordRepo))
+		r.GET("", handlers.GetRecordListHandler(recordRepo))
+		r.GET("/{id}", handlers.GetRecordHandler(recordRepo))
+		r.PUT("", handlers.UpdateRecordHandler(recordRepo))
+		r.DELETE("", handlers.DeleteRecordHandler(recordRepo))
 	}
+
 	// API v1 routes .. PS in future when AUTh is implemented
 	// v1 := r.Group("/api/v1")
 	// {
