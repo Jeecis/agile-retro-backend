@@ -6,11 +6,11 @@ import (
 	"github.com/Jeecis/goapi/internal/ws"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/minio/minio-go"
 	"gorm.io/gorm"
 )
 
-func SetupRouter(db *gorm.DB, minio *minio.Client, boardRepo *repository.BoardRepository,
+func SetupRouter(db *gorm.DB,
+	boardRepo *repository.BoardRepository,
 	columnRepo *repository.ColumnRepository,
 	recordRepo *repository.RecordRepository,
 ) *gin.Engine {
@@ -31,7 +31,7 @@ func SetupRouter(db *gorm.DB, minio *minio.Client, boardRepo *repository.BoardRe
 		b := v1.Group("/board")
 		b.POST("", handlers.CreateBoard(boardRepo, columnRepo)) //simply create new board with now ws connection
 		b.GET("/:id/ws", ws.JoinBoard(boardRepo, columnRepo, recordRepo))
-		b.DELETE("", handlers.DeleteBoardHandler(boardRepo)) //delete board with all records and disconnect all users
+		// b.DELETE("", handlers.DeleteBoardHandler(boardRepo)) //delete board with all records and disconnect all users
 
 	}
 
