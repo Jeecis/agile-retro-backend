@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+
 	"github.com/Jeecis/goapi/internal/models"
 	"gorm.io/gorm"
 )
@@ -8,6 +10,8 @@ import (
 type ColumnRepository struct {
 	db *gorm.DB
 }
+
+var ErrColumnNotFound = errors.New("column not found")
 
 // NewColumnRepository creates a new instance of ColumnRepository
 func NewColumnRepository(db *gorm.DB) *ColumnRepository {
@@ -39,6 +43,18 @@ func (r *ColumnRepository) GetAll() ([]models.Column, error) {
 }
 
 // Update modifies an existing Column in the database
-func (r *ColumnRepository) Update(column *models.Column) error {
+func (r *ColumnRepository) Update(column models.Column) error {
 	return r.db.Save(column).Error
+}
+
+func (r *ColumnRepository) ColumnExists(id string) bool {
+	var column models.Column
+	err := r.db.Where("column_id = ?", id).First(&column).Error
+	return err == nil
+}
+
+func (r *ColumnRepository) QueryBoardColumns(boardID string) ([]models.Column, error) {
+	var columns []models.Column
+	err := r.db.Where("board_id = ?", boardID).Find(&columns).Error
+	return columns, err
 }

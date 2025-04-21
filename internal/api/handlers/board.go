@@ -1,39 +1,34 @@
 package handlers
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/Jeecis/goapi/internal/models"
 	"github.com/Jeecis/goapi/internal/repository"
+	service "github.com/Jeecis/goapi/internal/services"
 	"github.com/gin-gonic/gin"
 )
 
-func CreateBoardHandler(boardRepo *repository.BoardRepository) gin.HandlerFunc {
+func CreateBoard(boardRepo *repository.BoardRepository, columnRepo *repository.ColumnRepository) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var board models.Board
-		if err := c.ShouldBindJSON(&board); err != nil {
-			c.JSON(400, gin.H{"error": err.Error()})
+
+		var boardRequest struct {
+			Name string `json:"name" binding:"required"`
+		}
+
+		if err := c.ShouldBindJSON(&boardRequest); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request: " + err.Error()})
 			return
 		}
 
-		if err := boardRepo.Create(&board); err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
+		board, err := service.CreateBoard(boardRepo, columnRepo, boardRequest.Name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error: " + err.Error()})
 			return
 		}
 
 		c.JSON(201, board)
-	}
-}
-
-func GetBoardListHandler(boardRepo *repository.BoardRepository) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		boards, err := boardRepo.GetAll()
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(200, boards)
 	}
 }
 

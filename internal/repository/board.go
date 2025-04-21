@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"errors"
+
 	"github.com/Jeecis/goapi/internal/models"
 	"gorm.io/gorm"
 )
@@ -8,6 +10,8 @@ import (
 type BoardRepository struct {
 	db *gorm.DB
 }
+
+var ErrBoardNotFound = errors.New("board not found")
 
 // NewBoardRepository creates a new instance of BoardRepository
 func NewBoardRepository(db *gorm.DB) *BoardRepository {
@@ -22,7 +26,7 @@ func (r *BoardRepository) Create(board *models.Board) error {
 // GetByID retrieves a board by its ID
 func (r *BoardRepository) GetByID(id string) (*models.Board, error) {
 	var board models.Board
-	err := r.db.First(&board, id).Error
+	err := r.db.Where("id = ?", id).First(&board).Error
 	return &board, err
 }
 
@@ -31,14 +35,21 @@ func (r *BoardRepository) Delete(id uint) error {
 	return r.db.Delete(&models.Board{}, id).Error
 }
 
-// GetAll retrieves all boards from the database
-func (r *BoardRepository) GetAll() ([]models.Board, error) {
-	var boards []models.Board
-	err := r.db.Find(&boards).Error
-	return boards, err
-}
-
 // Update modifies an existing board's parameters except its ID
 func (r *BoardRepository) Update(board *models.Board) error {
 	return r.db.Save(board).Error
+}
+
+// BoardExists checks if a board with the given ID exists
+func (r *BoardRepository) BoardExists(id string) bool {
+	var board models.Board
+	err := r.db.Where("id = ?", id).First(&board).Error
+	return err == nil
+}
+
+// DelIDExists checks if a board with the given deletion ID exists
+func (r *BoardRepository) DelIDExists(delID string) bool {
+	var board models.Board
+	err := r.db.Where("deletion_id = ?", delID).First(&board).Error
+	return err == nil
 }
