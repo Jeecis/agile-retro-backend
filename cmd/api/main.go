@@ -30,17 +30,12 @@ func main() {
 		log.Fatal("Migration error: " + err.Error())
 	}
 
-	minio, err := config.InitializeMinio(cfg)
-	if err != nil {
-		log.Fatal("Minio error: " + err.Error())
-	}
-
 	boardRepo := repository.NewBoardRepository(db)
 	columnRepo := repository.NewColumnRepository(db)
 	recordRepo := repository.NewRecordRepository(db)
 
 	// Setup router
-	r := routes.SetupRouter(db, minio, boardRepo, columnRepo, recordRepo)
+	r := routes.SetupRouter(db, boardRepo, columnRepo, recordRepo)
 
 	// Start server
 	r.Run(":8080")
