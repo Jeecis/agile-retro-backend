@@ -70,3 +70,11 @@ func (r *RecordRepository) GetByColumnSorted(ColumnID string) ([]models.Record, 
 	err := r.db.Where("column_id = ?", ColumnID).Order("position").Find(&records).Error
 	return records, err
 }
+
+func (r *RecordRepository) DeleteAllByBoardID(boardID string) error {
+	result := r.db.Where("board_id = ?", boardID).Delete(&models.Record{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

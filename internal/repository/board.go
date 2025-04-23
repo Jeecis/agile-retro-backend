@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"log"
 
 	"github.com/Jeecis/goapi/internal/models"
 	"gorm.io/gorm"
@@ -52,4 +53,23 @@ func (r *BoardRepository) DelIDExists(delID string) bool {
 	var board models.Board
 	err := r.db.Where("deletion_id = ?", delID).First(&board).Error
 	return err == nil
+}
+
+// Retrieves a board by its deletion ID
+func (r *BoardRepository) GetBoardByDelID(delID string) (*models.Board, error) {
+	var board models.Board
+	log.Print("delID: ", delID)
+	err := r.db.Where("deletion_id = ?", delID).First(&board).Error
+	return &board, err
+}
+
+func (r *BoardRepository) DeleteByDelID(delID string) error {
+	result := r.db.Where("deletion_id = ?", delID).Delete(&models.Board{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return ErrBoardNotFound
+	}
+	return nil
 }

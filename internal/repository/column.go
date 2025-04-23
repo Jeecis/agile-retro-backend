@@ -58,3 +58,11 @@ func (r *ColumnRepository) QueryBoardColumns(boardID string) ([]models.Column, e
 	err := r.db.Where("board_id = ?", boardID).Find(&columns).Error
 	return columns, err
 }
+
+func (r *ColumnRepository) DeleteAllByBoardID(boardID string) error {
+	result := r.db.Where("board_id = ?", boardID).Delete(&models.Column{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}

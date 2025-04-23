@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/Jeecis/goapi/internal/models"
 	"github.com/Jeecis/goapi/internal/repository"
@@ -59,23 +58,5 @@ func UpdateBoardHandler(boardRepo *repository.BoardRepository) gin.HandlerFunc {
 		}
 
 		c.JSON(200, board)
-	}
-}
-
-func DeleteBoardHandler(boardRepo *repository.BoardRepository) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		id := c.Param("id")
-		idUint, err := strconv.ParseUint(id, 10, 32)
-		if err != nil {
-			c.JSON(400, gin.H{"error": "Invalid ID format"})
-			return
-		}
-
-		if err := boardRepo.Delete(uint(idUint)); err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(200, gin.H{"message": "Board deleted successfully"})
 	}
 }

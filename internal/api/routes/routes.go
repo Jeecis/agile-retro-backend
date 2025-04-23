@@ -31,7 +31,7 @@ func SetupRouter(db *gorm.DB,
 		b := v1.Group("/board")
 		b.POST("", handlers.CreateBoard(boardRepo, columnRepo)) //simply create new board with now ws connection
 		b.GET("/:id/ws", ws.JoinBoard(boardRepo, columnRepo, recordRepo))
-		// b.DELETE("", handlers.DeleteBoardHandler(boardRepo)) //delete board with all records and disconnect all users
+		b.GET("/:id/ws/delete", ws.DeleteBoard(boardRepo, columnRepo, recordRepo)) //delete board with all records and disconnect all users
 
 	}
 

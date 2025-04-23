@@ -13,6 +13,10 @@ type CreateRecord struct {
 	Text     string `json:"text"`
 }
 
+type DeleteBoard struct {
+	DelID string `json:"deletion_id"`
+}
+
 type MoveRecord struct {
 	RecordID       string  `json:"record_id"`
 	SourceColumnID string  `json:"source_column_id"`

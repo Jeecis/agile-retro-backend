@@ -301,3 +301,33 @@ func MoveRecord(
 
 	return record, nil
 }
+
+func DeleteBoard(
+	boardRepo *repository.BoardRepository,
+	columnRepo *repository.ColumnRepository,
+	recordRepo *repository.RecordRepository,
+	deletionObj models.DeleteBoard,
+) error {
+
+	board, err := boardRepo.GetBoardByDelID(deletionObj.DelID)
+	if err != nil {
+		return repository.ErrBoardNotFound
+	}
+
+	err = columnRepo.DeleteAllByBoardID(board.ID)
+	if err != nil {
+		return err
+	}
+
+	err = recordRepo.DeleteAllByBoardID(board.ID)
+	if err != nil {
+		return err
+	}
+
+	err = boardRepo.DeleteByDelID(deletionObj.DelID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

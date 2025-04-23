@@ -1,7 +1,7 @@
 package models
 
 type Record struct {
-	BoardID  string  `json:"id"`
+	BoardID  string  `json:"board_id"`
 	ColumnID string  `json:"column_id"`
 	RecordID string  `json:"record_id"`
 	Position float64 `json:"position"`

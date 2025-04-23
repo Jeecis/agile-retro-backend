@@ -15,6 +15,7 @@ const (
 	ActionUpdateRecord = "update_record"
 	ActionDeleteRecord = "delete_record"
 	ActionMoveRecord   = "move_record"
+	ActionDeleteBoard  = "delete_board"
 )
 
 // Message represents any message sent via WebSocket
@@ -30,6 +31,7 @@ var ActionHandlers = map[string]func(*Client, Message){
 	ActionCreateRecord: handleCreateRecord,
 	ActionUpdateRecord: handleUpdateRecord,
 	ActionDeleteRecord: handleDeleteRecord,
+	ActionDeleteBoard:  handleDeleteBoard,
 }
 
 func handleJoinBoard(c *Client, msg Message) {
@@ -176,4 +178,34 @@ func handleMoveRecord(c *Client, msg Message) {
 		Action:  "move_record",
 		Payload: payload,
 	}
+}
+
+func handleDeleteBoard(c *Client, msg Message) {
+	c.mu.Lock()         // Lock the mutex
+	defer c.mu.Unlock() // Unlock the mutex when done
+	var payload models.DeleteBoard
+
+	payloadBytes, err := json.Marshal(msg.Payload)
+	if err != nil {
+		log.Println("Error marshalling payload:", err)
+		return
+	}
+
+	err = json.Unmarshal(payloadBytes, &payload)
+	if err != nil {
+		log.Println("unmarshal error:", err)
+		return
+	}
+
+	c.hub.broadcast <- Message{
+		Action:  "delete_board",
+		Payload: payload,
+	}
+
+	err = service.DeleteBoard(c.boardRepo, c.columnRepo, c.recordRepo, payload)
+	if err != nil {
+		log.Println("Repository error:", err)
+		return
+	}
+
 }
